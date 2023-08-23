@@ -6,7 +6,7 @@ import com.example.submission2.data.source.datastore.SettingPreferences
 import com.example.submission2.data.source.local.service.DbConfig
 import com.example.submission2.data.source.remote.service.ApiConfig
 
-object Injection {
+object AppInjection {
     fun provideRepository(context: Context): AppRepository {
         val apiService = ApiConfig.getApiService()
         val dbDao = DbConfig.getInstance(context).dbDao()

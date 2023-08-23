@@ -19,20 +19,20 @@ data class SearchUserResponse(
 @Parcelize
 data class UserResponse(
     @field:SerializedName("login")
-    val login: String,
+    val login: String?,
 
     @field:SerializedName("id")
-    val id: Int,
+    val id: Int?,
 
     @field:SerializedName("followers")
-    val followers: Int,
+    val followers: Int?,
 
     @field:SerializedName("avatar_url")
-    val avatarUrl: String,
+    val avatarUrl: String?,
 
     @field:SerializedName("following")
-    val following: Int,
+    val following: Int?,
 
     @field:SerializedName("name")
-    val name: String,
+    val name: String?,
 ) : Parcelable
