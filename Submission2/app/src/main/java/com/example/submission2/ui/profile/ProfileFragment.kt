@@ -162,13 +162,12 @@ class ProfileFragment : Fragment() {
             }
 
             private fun isShowOption(layout: AppBarLayout, offset: Int): Boolean =
-                layout.totalScrollRange + offset in 0..30
+                layout.totalScrollRange + offset in 0..45
 
             private fun isShowToolbar(layout: AppBarLayout, offset: Int): Boolean =
                 layout.totalScrollRange + offset < layout.totalScrollRange.toFloat() * 0.5
         })
     }
-
 
     private fun showOption(isShow: Boolean, myMenu: Menu, id: Int) {
         val item: MenuItem = myMenu.findItem(id)
@@ -180,7 +179,7 @@ class ProfileFragment : Fragment() {
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         val collapsingToolbar = binding?.collapsingToolbar
-        collapsingToolbar?.title = "Username"
+        collapsingToolbar?.title = "RTAgung"
         collapsingToolbar?.setCollapsedTitleTextColor(
             ContextCompat.getColor(requireActivity(), R.color.white)
         )

@@ -13,4 +13,6 @@
     <string name="text_name">Name</string>
     <string name="tab_text_followers">Followers</string>
     <string name="tab_text_following">Following</string>
+    <string name="menu_favorite">Menu Favorite</string>
+    <string name="menu_setting">Menu Setting</string>
 </resources>
