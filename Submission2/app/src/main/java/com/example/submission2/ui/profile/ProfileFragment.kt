@@ -1,60 +1,214 @@
 package com.example.submission2.ui.profile
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
+import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.submission2.R
+import com.example.submission2.data.Result
+import com.example.submission2.data.model.User
+import com.example.submission2.databinding.FragmentProfileBinding
+import com.example.submission2.ui.ViewModelFactory
+import com.example.submission2.ui.adapter.SectionPagerAdapter
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding
+    private lateinit var viewModel: ProfileViewModel
+
+    companion object {
+        @StringRes
+        private val TAB_TITLES = intArrayOf(
+            R.string.tab_text_followers, R.string.tab_text_following
+        )
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        _binding = FragmentProfileBinding.inflate(layoutInflater)
+        return binding?.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initViewModel()
+        initAppbar()
+        initAppbarMenu()
+        initTabLayout()
+        getDetailUserObserve()
+    }
+
+    private fun getDetailUserObserve() {
+        viewModel.getDetailUser("RTAgung").observe(viewLifecycleOwner) { result ->
+            if (result != null) {
+                when (result) {
+                    is Result.Loading -> showLoading(true)
+                    is Result.Success -> {
+                        showLoading(false)
+                        val data = result.data
+                        setView(data)
+                    }
+
+                    is Result.Error -> showLoading(false)
                 }
             }
+        }
+    }
+
+    private fun setView(data: User) {
+        binding?.tvProfileUsername?.text = data.login
+        binding?.tvProfileRepo?.text = (data.repositories ?: 0).toString()
+        binding?.tvProfileFollowers?.text = (data.followers ?: 0).toString()
+        binding?.tvProfileFollowing?.text = (data.following ?: 0).toString()
+        binding?.collapsingToolbar?.title = data.login
+
+        if (data.name != null) {
+            binding?.tvProfileName?.text = data.name
+            binding?.tvProfileName?.visibility = View.VISIBLE
+        }
+        if (data.email != null) {
+            binding?.tvProfileEmail?.text = data.email
+            binding?.tvProfileEmail?.visibility = View.VISIBLE
+        }
+        if (data.bio != null) {
+            binding?.tvProfileBio?.text = data.bio
+            binding?.tvProfileBio?.visibility = View.VISIBLE
+        }
+
+        val requestOptions = RequestOptions()
+        requestOptions.placeholder(R.drawable.baseline_account_circle_gray_24)
+        requestOptions.error(R.drawable.baseline_account_circle_gray_24)
+        binding?.civProfileAvatar?.let {
+            Glide.with(requireActivity()).setDefaultRequestOptions(requestOptions)
+                .load(data.avatarUrl).into(it)
+        }
+    }
+
+    private fun initTabLayout() {
+        val sectionPagerAdapter =
+            SectionPagerAdapter(activity as AppCompatActivity, "RTAgung") { username ->
+                navigateToDetail(username)
+            }
+        val viewPager = binding?.viewPager as ViewPager2
+        viewPager.adapter = sectionPagerAdapter
+        val tabs = binding?.tabs as TabLayout
+        TabLayoutMediator(tabs, viewPager) { tab, position ->
+            tab.text = resources.getString(TAB_TITLES[position])
+        }.attach()
+    }
+
+    private fun navigateToDetail(username: String) {
+        val navigateToDetail = ProfileFragmentDirections.actionProfileFragmentToDetailFragment()
+        navigateToDetail.username = username
+        view?.findNavController()?.navigate(navigateToDetail)
+    }
+
+    private fun initAppbarMenu() {
+        var myMenu: Menu? = null
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                myMenu = menu
+                menuInflater.inflate(R.menu.profile_menu, menu)
+                showOption(false, menu, R.id.profile_menu_setting)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.profile_menu_setting -> {
+                        navigateToSetting()
+                    }
+                }
+                return true
+            }
+        }, viewLifecycleOwner, androidx.lifecycle.Lifecycle.State.RESUMED)
+
+        val appBarLayout = binding?.appbar
+        appBarLayout?.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+                if (myMenu != null) {
+                    if (isShowToolbar(appBarLayout, verticalOffset)) {
+                        binding?.toolbar?.visibility = View.VISIBLE
+                    } else {
+                        binding?.toolbar?.visibility = View.GONE
+                    }
+                    if (isShowOption(appBarLayout, verticalOffset)) {
+                        showOption(true, myMenu!!, R.id.profile_menu_setting)
+                    } else {
+                        showOption(false, myMenu!!, R.id.profile_menu_setting)
+                    }
+                }
+            }
+
+            private fun isShowOption(layout: AppBarLayout, offset: Int): Boolean =
+                layout.totalScrollRange + offset in 0..30
+
+            private fun isShowToolbar(layout: AppBarLayout, offset: Int): Boolean =
+                layout.totalScrollRange + offset < layout.totalScrollRange.toFloat() * 0.5
+        })
+    }
+
+
+    private fun showOption(isShow: Boolean, myMenu: Menu, id: Int) {
+        val item: MenuItem = myMenu.findItem(id)
+        item.isVisible = isShow
+    }
+
+    private fun initAppbar() {
+        val toolbar = binding?.toolbar
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+
+        val collapsingToolbar = binding?.collapsingToolbar
+        collapsingToolbar?.title = "Username"
+        collapsingToolbar?.setCollapsedTitleTextColor(
+            ContextCompat.getColor(requireActivity(), R.color.white)
+        )
+        collapsingToolbar?.setExpandedTitleColor(
+            ContextCompat.getColor(requireActivity(), android.R.color.transparent)
+        )
+
+        binding?.ibProfileSetting?.setOnClickListener {
+            navigateToSetting()
+        }
+    }
+
+    private fun navigateToSetting() {
+        val navigateToSetting = ProfileFragmentDirections.actionProfileFragmentToSettingFragment()
+        view?.findNavController()?.navigate(navigateToSetting)
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        if (isLoading) {
+            binding?.linearLoading?.visibility = View.VISIBLE
+        } else {
+            binding?.linearLoading?.visibility = View.GONE
+        }
+    }
+
+    private fun initViewModel() {
+        val factory = ViewModelFactory.getInstance(requireActivity())
+        val initViewModel: ProfileViewModel by viewModels { factory }
+        viewModel = initViewModel
     }
 }

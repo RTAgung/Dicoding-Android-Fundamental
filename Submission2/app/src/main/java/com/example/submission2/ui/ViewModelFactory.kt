@@ -7,6 +7,7 @@ import com.example.submission2.data.AppRepository
 import com.example.submission2.di.AppInjection
 import com.example.submission2.ui.detail.DetailViewModel
 import com.example.submission2.ui.favorite.FavoriteViewModel
+import com.example.submission2.ui.follow.FollowViewModel
 import com.example.submission2.ui.home.HomeViewModel
 import com.example.submission2.ui.profile.ProfileViewModel
 import com.example.submission2.ui.setting.SettingViewModel
@@ -25,6 +26,8 @@ class ViewModelFactory private constructor(private val appRepository: AppReposit
             return SettingViewModel(appRepository) as T
         } else if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
             return ProfileViewModel(appRepository) as T
+        } else if (modelClass.isAssignableFrom(FollowViewModel::class.java)) {
+            return FollowViewModel(appRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
     }

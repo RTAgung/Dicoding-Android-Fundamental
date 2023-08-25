@@ -1,47 +1,50 @@
 package com.example.submission2.ui.adapter
 
-import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.example.submission2.R
 import com.example.submission2.data.model.User
 import com.example.submission2.databinding.UserItemBinding
 
-class UserListAdapter : ListAdapter<User, UserListAdapter.MyViewHolder>(DIFF_CALLBACK) {
+class UserListAdapter(private val callback: (String) -> Unit) :
+    RecyclerView.Adapter<UserListAdapter.MyViewHolder>() {
+    private var userListData = ArrayList<User>()
 
-    class MyViewHolder(val binding: UserItemBinding) : RecyclerView.ViewHolder(
-        binding.root
-    ) {
+    fun setData(userList: List<User>) {
+        userListData.clear()
+        userListData.addAll(userList)
+        notifyDataSetChanged()
+    }
+
+    class MyViewHolder(
+        private val binding: UserItemBinding, private val callback: (String) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
             binding.tvUsername.text = user.login
-            Glide.with(itemView.context).load(user.avatarUrl).into(binding.civAvatar)
+
+            val requestOptions = RequestOptions()
+            requestOptions.placeholder(R.drawable.baseline_account_circle_gray_24)
+            requestOptions.error(R.drawable.baseline_account_circle_gray_24)
+            Glide.with(itemView.context).setDefaultRequestOptions(requestOptions)
+                .load(user.avatarUrl).into(binding.civAvatar)
+
+            itemView.setOnClickListener {
+                callback(user.login ?: "null")
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding = UserItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MyViewHolder(binding)
+        return MyViewHolder(binding, callback)
     }
+
+    override fun getItemCount(): Int = userListData.size
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val user = getItem(position)
-        holder.bind(user)
-    }
-
-    companion object {
-        val DIFF_CALLBACK: DiffUtil.ItemCallback<User> = object : DiffUtil.ItemCallback<User>() {
-            override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-                return oldItem.login == newItem.login
-            }
-
-            @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
-                return oldItem == newItem
-            }
-        }
+        holder.bind(userListData[position])
     }
 }

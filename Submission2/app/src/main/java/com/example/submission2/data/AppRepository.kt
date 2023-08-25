@@ -26,8 +26,8 @@ class AppRepository private constructor(
         } catch (e: Exception) {
             emit(Result.Error(e.message.toString()))
         }
-        val data: LiveData<Result<List<User>>> = dbDao.getAllUser()
-            .map { Result.Success(Mapping.listUserEntityToListUser(it)) }
+        val data: LiveData<Result<List<User>>> =
+            dbDao.getAllUser().map { Result.Success(Mapping.listUserEntityToListUser(it)) }
         emitSource(data)
     }
 
@@ -43,16 +43,46 @@ class AppRepository private constructor(
         }
     }
 
+    fun getDetailUser(username: String): LiveData<Result<User>> = liveData {
+        emit(Result.Loading)
+        try {
+            val response = apiService.getDetailUser(username)
+            val user = Mapping.userResponseToUser(response)
+            emit(Result.Success(user))
+        } catch (e: Exception) {
+            emit(Result.Error(e.message.toString()))
+        }
+    }
+
+    fun getUserFollowers(username: String): LiveData<Result<List<User>>> = liveData {
+        emit(Result.Loading)
+        try {
+            val response = apiService.getUserFollowers(username)
+            val listUser = Mapping.listUserResponseToListUser(response)
+            emit(Result.Success(listUser))
+        } catch (e: Exception) {
+            emit(Result.Error(e.message.toString()))
+        }
+    }
+
+    fun getUserFollowing(username: String): LiveData<Result<List<User>>> = liveData {
+        emit(Result.Loading)
+        try {
+            val response = apiService.getUserFollowing(username)
+            val listUser = Mapping.listUserResponseToListUser(response)
+            emit(Result.Success(listUser))
+        } catch (e: Exception) {
+            emit(Result.Error(e.message.toString()))
+        }
+    }
+
     companion object {
         @Volatile
         private var instance: AppRepository? = null
         fun getInstance(
-            apiService: ApiService,
-            dbDao: DbDao,
-            settingPreferences: SettingPreferences
-        ): AppRepository =
-            instance ?: synchronized(this) {
-                instance ?: AppRepository(apiService, dbDao, settingPreferences)
-            }.also { instance = it }
+            apiService: ApiService, dbDao: DbDao, settingPreferences: SettingPreferences
+        ): AppRepository = instance ?: synchronized(this) {
+            instance ?: AppRepository(apiService, dbDao, settingPreferences)
+        }.also { instance = it }
     }
 }

@@ -13,9 +13,12 @@ object Mapping {
                     id = userEntity.id,
                     avatarUrl = userEntity.avatarUrl,
                     login = userEntity.login,
-                    name = "null",
-                    following = 0,
-                    followers = 0
+                    name = null,
+                    following = null,
+                    followers = null,
+                    bio = null,
+                    email = null,
+                    repositories = null
                 )
             )
         }
@@ -41,15 +44,30 @@ object Mapping {
         for (userResponse in listUserResponse) {
             listUser.add(
                 User(
-                    id = userResponse.id ?: 0,
-                    avatarUrl = userResponse.avatarUrl ?: "null",
-                    login = userResponse.login ?: "null",
-                    name = userResponse.name ?: "null",
-                    following = userResponse.following ?: 0,
-                    followers = userResponse.followers ?: 0
+                    id = userResponse.id,
+                    avatarUrl = userResponse.avatarUrl,
+                    login = userResponse.login,
+                    name = userResponse.name,
+                    following = userResponse.following,
+                    followers = userResponse.followers,
+                    bio = userResponse.bio,
+                    email = userResponse.email,
+                    repositories = userResponse.publicRepos
                 )
             )
         }
         return listUser
     }
+
+    fun userResponseToUser(userResponse: UserResponse): User = User(
+        id = userResponse.id,
+        avatarUrl = userResponse.avatarUrl,
+        login = userResponse.login,
+        name = userResponse.name,
+        following = userResponse.following,
+        followers = userResponse.followers,
+        bio = userResponse.bio,
+        email = userResponse.email,
+        repositories = userResponse.publicRepos
+    )
 }

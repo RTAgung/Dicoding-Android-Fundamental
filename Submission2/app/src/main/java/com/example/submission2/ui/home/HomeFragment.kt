@@ -8,13 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.submission2.data.Result
-import com.example.submission2.data.model.User
 import com.example.submission2.databinding.FragmentHomeBinding
 import com.example.submission2.ui.ViewModelFactory
-import com.example.submission2.ui.adapter.UserListAdapter2
+import com.example.submission2.ui.adapter.UserListAdapter
 import java.util.Timer
 import java.util.TimerTask
 
@@ -23,12 +23,11 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
     private lateinit var viewModel: HomeViewModel
-    private lateinit var userAdapter: UserListAdapter2
-    private lateinit var userSearchAdapter: UserListAdapter2
+    private lateinit var userAdapter: UserListAdapter
+    private lateinit var userSearchAdapter: UserListAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHomeBinding.inflate(layoutInflater)
         return binding?.root
@@ -49,15 +48,16 @@ class HomeFragment : Fragment() {
     }
 
     private fun initSearchRecyclerView() {
-        userSearchAdapter = UserListAdapter2()
+        userSearchAdapter = UserListAdapter { username ->
+            navigateToDetail(username)
+        }
         binding?.rvSearchUser?.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
             adapter = userSearchAdapter
             addItemDecoration(
                 DividerItemDecoration(
-                    context,
-                    DividerItemDecoration.VERTICAL
+                    context, DividerItemDecoration.VERTICAL
                 )
             )
         }
@@ -116,18 +116,25 @@ class HomeFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        userAdapter = UserListAdapter2()
+        userAdapter = UserListAdapter { username ->
+            navigateToDetail(username)
+        }
         binding?.rvUser?.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
             adapter = userAdapter
             addItemDecoration(
                 DividerItemDecoration(
-                    context,
-                    DividerItemDecoration.VERTICAL
+                    context, DividerItemDecoration.VERTICAL
                 )
             )
         }
+    }
+
+    private fun navigateToDetail(username: String) {
+        val navigateToDetail = HomeFragmentDirections.actionHomeFragmentToDetailFragment()
+        navigateToDetail.username = username
+        view?.findNavController()?.navigate(navigateToDetail)
     }
 
     private fun initViewModel() {

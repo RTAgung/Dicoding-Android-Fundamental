@@ -2,4 +2,15 @@
     <string name="app_name">Submission2</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_number">0</string>
+    <string name="text_repositories">Repositories</string>
+    <string name="text_followers">Followers</string>
+    <string name="text_following">Following</string>
+    <string name="text_username">Username</string>
+    <string name="text_setting">Setting</string>
+    <string name="text_bio">Bio</string>
+    <string name="text_email">Email</string>
+    <string name="text_name">Name</string>
+    <string name="tab_text_followers">Followers</string>
+    <string name="tab_text_following">Following</string>
 </resources>
