@@ -20,8 +20,7 @@ class FavoriteFragment : Fragment() {
     private lateinit var userAdapter: UserListAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentFavoriteBinding.inflate(layoutInflater)
         return binding?.root

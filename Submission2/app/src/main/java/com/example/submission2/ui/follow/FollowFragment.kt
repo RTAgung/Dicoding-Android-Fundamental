@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.submission2.data.Result
@@ -14,7 +13,7 @@ import com.example.submission2.databinding.FragmentFollowBinding
 import com.example.submission2.ui.ViewModelFactory
 import com.example.submission2.ui.adapter.UserListAdapter
 
-class FollowFragment(private val callback: (String) -> Unit) : Fragment() {
+class FollowFragment : Fragment() {
 
     private var indexTab: Int = 0
     private lateinit var username: String
@@ -22,6 +21,7 @@ class FollowFragment(private val callback: (String) -> Unit) : Fragment() {
     private val binding get() = _binding
     private lateinit var viewModel: FollowViewModel
     private lateinit var userAdapter: UserListAdapter
+    private var callback: ((String) -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -50,7 +50,7 @@ class FollowFragment(private val callback: (String) -> Unit) : Fragment() {
 
     private fun initRecyclerView() {
         userAdapter = UserListAdapter { username ->
-            callback(username)
+            callback?.invoke(username)
         }
         binding?.rvUserFollow?.apply {
             layoutManager = LinearLayoutManager(context)
@@ -107,12 +107,17 @@ class FollowFragment(private val callback: (String) -> Unit) : Fragment() {
         const val FOLLOWING_TAB = 1
 
         @JvmStatic
-        fun newInstance(position: Int, username: String, callback: (String) -> Unit) =
-            FollowFragment(callback).apply {
+        fun newInstance(
+            position: Int, username: String, callback: (String) -> Unit
+        ): FollowFragment {
+            val fragment = FollowFragment()
+            fragment.callback = callback
+            return fragment.apply {
                 arguments = Bundle().apply {
                     putInt(ARG_SECTION_NUMBER, position)
                     putString(ARG_USERNAME, username)
                 }
             }
+        }
     }
 }

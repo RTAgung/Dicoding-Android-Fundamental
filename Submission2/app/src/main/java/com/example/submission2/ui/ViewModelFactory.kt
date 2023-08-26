@@ -28,6 +28,8 @@ class ViewModelFactory private constructor(private val appRepository: AppReposit
             return ProfileViewModel(appRepository) as T
         } else if (modelClass.isAssignableFrom(FollowViewModel::class.java)) {
             return FollowViewModel(appRepository) as T
+        } else if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            return MainViewModel(appRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
     }
@@ -35,9 +37,8 @@ class ViewModelFactory private constructor(private val appRepository: AppReposit
     companion object {
         @Volatile
         private var instance: ViewModelFactory? = null
-        fun getInstance(context: Context): ViewModelFactory =
-            instance ?: synchronized(this) {
-                instance ?: ViewModelFactory(AppInjection.provideRepository(context))
-            }.also { instance = it }
+        fun getInstance(context: Context): ViewModelFactory = instance ?: synchronized(this) {
+            instance ?: ViewModelFactory(AppInjection.provideRepository(context))
+        }.also { instance = it }
     }
 }

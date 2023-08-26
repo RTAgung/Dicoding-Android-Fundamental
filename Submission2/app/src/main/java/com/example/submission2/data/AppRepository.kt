@@ -1,6 +1,7 @@
 package com.example.submission2.data
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import com.example.submission2.data.model.User
@@ -93,6 +94,14 @@ class AppRepository private constructor(
 
     suspend fun deleteFavorite(username: String) {
         dbDao.deleteFavorite(username)
+    }
+
+    fun getThemeSettings(): LiveData<Boolean> {
+        return settingPreferences.getThemeSetting().asLiveData()
+    }
+
+    suspend fun saveThemeSetting(isDarkModeActive: Boolean) {
+        settingPreferences.saveThemeSetting(isDarkModeActive)
     }
 
     companion object {

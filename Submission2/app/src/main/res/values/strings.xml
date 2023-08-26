@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Submission2</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_number">0</string>
     <string name="text_repositories">Repositories</string>
     <string name="text_followers">Followers</string>
@@ -15,4 +13,11 @@
     <string name="tab_text_following">Following</string>
     <string name="menu_favorite">Menu Favorite</string>
     <string name="menu_setting">Menu Setting</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="text_back">back</string>
+    <string name="text_home">Home</string>
+    <string name="text_favorite">Favorite</string>
+    <string name="text_profile">Profile</string>
+    <string name="text_no_available_data">no available data</string>
+    <string name="text_search">Search</string>
 </resources>
