@@ -59,7 +59,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun getDetailUserObserve() {
-        viewModel.getDetailUser("RTAgung").observe(viewLifecycleOwner) { result ->
+        viewModel.getDetailUser().observe(viewLifecycleOwner) { result ->
             if (result != null) {
                 when (result) {
                     is Result.Loading -> showLoading(true)
@@ -106,7 +106,7 @@ class ProfileFragment : Fragment() {
 
     private fun initTabLayout() {
         val sectionPagerAdapter =
-            SectionPagerAdapter(activity as AppCompatActivity, "RTAgung") { username ->
+            SectionPagerAdapter(activity as AppCompatActivity, viewModel.username) { username ->
                 navigateToDetail(username)
             }
         val viewPager = binding?.viewPager as ViewPager2
@@ -179,7 +179,7 @@ class ProfileFragment : Fragment() {
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         val collapsingToolbar = binding?.collapsingToolbar
-        collapsingToolbar?.title = "RTAgung"
+        collapsingToolbar?.title = viewModel.username
         collapsingToolbar?.setCollapsedTitleTextColor(
             ContextCompat.getColor(requireActivity(), R.color.white)
         )

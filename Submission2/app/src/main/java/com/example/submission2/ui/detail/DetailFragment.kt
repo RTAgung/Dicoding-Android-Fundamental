@@ -32,6 +32,7 @@ class DetailFragment : Fragment() {
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding
     private lateinit var viewModel: DetailViewModel
+    private var myMenu: Menu? = null
 
     companion object {
         @StringRes
@@ -56,17 +57,56 @@ class DetailFragment : Fragment() {
         initAppbarMenu()
         initTabLayout()
         getDetailUserObserve()
+        checkFavoriteObserve()
+    }
+
+    private fun checkFavoriteObserve() {
+        viewModel.checkFavorite().observe(viewLifecycleOwner) { isFavorite ->
+            if (isFavorite != null) {
+                viewModel.setFavorite(isFavorite)
+            }
+        }
+        viewModel.getFavorite().observe(viewLifecycleOwner) { isFavorite ->
+            setFavoriteState(isFavorite)
+        }
+    }
+
+    private fun setFavoriteState(isFavorite: Boolean) {
+        viewModel.isFavoriteState = isFavorite
+        if (isFavorite) {
+            binding?.ibDetailFavorite?.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireActivity(), R.drawable.baseline_favorite_primary_24
+                )
+            )
+            if (myMenu != null) {
+                myMenu?.findItem(R.id.detail_menu_favorite)?.icon = ContextCompat.getDrawable(
+                    requireActivity(), R.drawable.baseline_favorite_white_24
+                )
+            }
+        } else {
+            binding?.ibDetailFavorite?.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireActivity(), R.drawable.baseline_favorite_border_primary_24
+                )
+            )
+            if (myMenu != null) {
+                myMenu?.findItem(R.id.detail_menu_favorite)?.icon = ContextCompat.getDrawable(
+                    requireActivity(), R.drawable.baseline_favorite_border_white_24
+                )
+            }
+        }
     }
 
     private fun getDetailUserObserve() {
-        viewModel.getDetailUser(viewModel.username).observe(viewLifecycleOwner) { result ->
+        viewModel.getDetailUser().observe(viewLifecycleOwner) { result ->
             if (result != null) {
                 when (result) {
                     is Result.Loading -> showLoading(true)
                     is Result.Success -> {
                         showLoading(false)
-                        val data = result.data
-                        setView(data)
+                        viewModel.data = result.data
+                        setView(result.data)
                     }
 
                     is Result.Error -> showLoading(false)
@@ -136,8 +176,6 @@ class DetailFragment : Fragment() {
     }
 
     private fun initAppbarMenu() {
-        var myMenu: Menu? = null
-
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -184,7 +222,13 @@ class DetailFragment : Fragment() {
     }
 
     private fun setFavorite() {
-//        TODO("Not yet implemented")
+        if (viewModel.isFavoriteState) {
+            viewModel.deleteFavorite()
+            viewModel.setFavorite(false)
+        } else {
+            viewModel.insertFavorite()
+            viewModel.setFavorite(true)
+        }
     }
 
     private fun showOption(isShow: Boolean, myMenu: Menu) {

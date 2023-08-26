@@ -76,6 +76,25 @@ class AppRepository private constructor(
         }
     }
 
+    fun getAllFavorite(): LiveData<List<User>> = liveData {
+        val favoriteUserEntity = dbDao.getAllFavorite()
+        val user = Mapping.listFavoriteUserEntityToListUser(favoriteUserEntity)
+        emit(user)
+    }
+
+    fun isFavorite(username: String): LiveData<Boolean> = liveData {
+        emit(dbDao.isFavorite(username))
+    }
+
+    suspend fun insertFavorite(user: User) {
+        val favoriteUserEntity = Mapping.userToFavoriteUserEntity(user)
+        dbDao.insertFavorite(favoriteUserEntity)
+    }
+
+    suspend fun deleteFavorite(username: String) {
+        dbDao.deleteFavorite(username)
+    }
+
     companion object {
         @Volatile
         private var instance: AppRepository? = null

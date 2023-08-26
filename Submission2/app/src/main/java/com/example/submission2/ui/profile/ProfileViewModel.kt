@@ -4,5 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.example.submission2.data.AppRepository
 
 class ProfileViewModel(private val appRepository: AppRepository) : ViewModel() {
-    fun getDetailUser(username: String) = appRepository.getDetailUser(username)
+    var username = "RTAgung"
+
+    fun getDetailUser() = appRepository.getDetailUser(username)
 }

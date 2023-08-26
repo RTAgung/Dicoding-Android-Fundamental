@@ -1,6 +1,7 @@
 package com.example.submission2.utils
 
 import com.example.submission2.data.model.User
+import com.example.submission2.data.source.local.entity.FavoriteUserEntity
 import com.example.submission2.data.source.local.entity.UserEntity
 import com.example.submission2.data.source.remote.response.UserResponse
 
@@ -70,4 +71,30 @@ object Mapping {
         email = userResponse.email,
         repositories = userResponse.publicRepos
     )
+
+    fun userToFavoriteUserEntity(user: User): FavoriteUserEntity = FavoriteUserEntity(
+        id = user.id ?: 0,
+        login = user.login ?: "null",
+        avatarUrl = user.avatarUrl ?: "null"
+    )
+
+    fun listFavoriteUserEntityToListUser(listFavoriteUserEntity: List<FavoriteUserEntity>): List<User> {
+        val listUser = ArrayList<User>()
+        for (favoriteUserEntity in listFavoriteUserEntity) {
+            listUser.add(
+                User(
+                    id = favoriteUserEntity.id,
+                    avatarUrl = favoriteUserEntity.avatarUrl,
+                    login = favoriteUserEntity.login,
+                    name = null,
+                    following = null,
+                    followers = null,
+                    bio = null,
+                    email = null,
+                    repositories = null
+                )
+            )
+        }
+        return listUser
+    }
 }

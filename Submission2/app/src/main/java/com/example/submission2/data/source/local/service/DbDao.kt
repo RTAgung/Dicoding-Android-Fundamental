@@ -22,7 +22,7 @@ interface DbDao {
 
     //    Query For Only Favorite User
     @Query("SELECT * FROM favorite")
-    fun getAllFavorite(): LiveData<List<FavoriteUserEntity>>
+    suspend fun getAllFavorite(): List<FavoriteUserEntity>
 
     @Query("SELECT EXISTS(SELECT * FROM favorite WHERE login = :userLogin)")
     suspend fun isFavorite(userLogin: String): Boolean
